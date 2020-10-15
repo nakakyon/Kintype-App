@@ -6,7 +6,6 @@ declare module 'vue/types/vue' {
     $router: VueRouter
     $moment: typeof moment
     $copyText: any
-    $bus: any
   }
 }
 
