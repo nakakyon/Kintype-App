@@ -1,0 +1,62 @@
+[
+  {
+    "name": "index",
+    "path": "/",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/index.vue",
+    "chunkName": "pages/index",
+    "_name": "_ec9fb8c8"
+  },
+  {
+    "name": "group_id",
+    "path": "/:group_id",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/index.vue",
+    "chunkName": "pages/_group_id/index",
+    "_name": "_75bbb987"
+  },
+  {
+    "name": "group_id-members",
+    "path": "/:group_id/members",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/members/index.vue",
+    "chunkName": "pages/_group_id/members/index",
+    "_name": "_242e0f11"
+  },
+  {
+    "name": "group_id-members-new",
+    "path": "/:group_id/members/new",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/members/new.vue",
+    "chunkName": "pages/_group_id/members/new",
+    "_name": "_471c769f"
+  },
+  {
+    "name": "group_id-members-member_id-edit",
+    "path": "/:group_id/members/:member_id/edit",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/members/_member_id/edit.vue",
+    "chunkName": "pages/_group_id/members/_member_id/edit",
+    "_name": "_41dee312"
+  },
+  {
+    "name": "group_id-attendances-attend_date-member_id-edit",
+    "path": "/:group_id/attendances/:attend_date?/:member_id?/edit",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/attendances/_attend_date/_member_id/edit.vue",
+    "chunkName": "pages/_group_id/attendances/_attend_date/_member_id/edit",
+    "_name": "_7cf1aafd"
+  },
+  {
+    "name": "group_id-attendances-selected_date",
+    "path": "/:group_id/attendances/:selected_date",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/index.vue",
+    "_name": "_75bbb987"
+  },
+  {
+    "name": "group_id-members-new-init",
+    "path": "/:group_id/members/new/:init",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/_group_id/members/new.vue",
+    "_name": "_471c769f"
+  },
+  {
+    "name": "not_found",
+    "path": "*",
+    "component": "/Users/kyousuke/Nuxtjs/kintype3/project/src/pages/index.vue",
+    "_name": "_ec9fb8c8"
+  }
+]

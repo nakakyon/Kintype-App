@@ -13,7 +13,6 @@
           :vertical="true"
           :timeout="5000"
           absolute
-          color="grey darken-1"
           centered
           style="white-space: pre-wrap;"
         >
@@ -102,12 +101,12 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
-// import { GroupExists } from '../../utils/firebase'
+import { Member, Attendance } from '@/datas/types'
 
 @Component({
   components: {},
 })
-export default class New extends Vue {
+export default class Index extends Vue {
   attendDate: string = ''
   dateSelect: {
     label: string
@@ -150,26 +149,26 @@ export default class New extends Vue {
     const workBreaks = ['有給休暇', '振替休日', '代休', '特別有休', '欠勤']
     members.get().then(function(snapShot) {
       snapShot.docs.map(doc => {
-        if (t.attendDate in doc.data()) {
+        const mdata = doc.data() as Member
+        if (t.attendDate in mdata) {
+          const adata = mdata[t.attendDate] as Attendance
           t.attendanceList.push({
             id: doc.id,
-            name: doc.data().name,
-            startTime: workBreaks.includes(doc.data()[t.attendDate].plan)
+            name: mdata.name,
+            startTime: workBreaks.includes(adata.plan)
               ? '--:--'
-              : doc.data()[t.attendDate].start_time,
-            endTime: workBreaks.includes(doc.data()[t.attendDate].plan)
-              ? '--:--'
-              : doc.data()[t.attendDate].end_time,
-            plan: doc.data()[t.attendDate].plan,
-            reason: doc.data()[t.attendDate].reason,
+              : adata.start_time,
+            endTime: workBreaks.includes(adata.plan) ? '--:--' : adata.end_time,
+            plan: adata.plan,
+            reason: adata.reason,
             route: `/${t.$route.params.group_id}/attendances/${t.attendDate}/${doc.id}/edit`,
           })
         } else {
           t.attendanceList.push({
             id: doc.id,
-            name: doc.data().name,
-            startTime: doc.data().start_time,
-            endTime: doc.data().end_time,
+            name: mdata.name,
+            startTime: mdata.start_time,
+            endTime: mdata.end_time,
             plan: '未定',
             reason: '',
             route: `/${t.$route.params.group_id}/attendances/${t.attendDate}/${doc.id}/edit`,
@@ -189,6 +188,7 @@ export default class New extends Vue {
         value: str,
       }
     } else {
+      // @ts-ignore
       this.attendDate = `${this.$moment(new Date()).format('YYYYMMDD')}`
       this.dateSelect = this.createDateObject(new Date())
     }
@@ -210,12 +210,15 @@ export default class New extends Vue {
 
   createDateObject(d: Date) {
     return {
+      // @ts-ignore
       label: `${this.$moment(d).format('YYYY/MM/DD')}`,
+      // @ts-ignore
       value: `${this.$moment(d).format('YYYYMMDD')}`,
     }
   }
 
   changeRoute(value: string) {
+    // @ts-ignore
     if (value === this.$moment(new Date()).format('YYYYMMDD')) {
       this.$router.push({
         path: `/${this.$route.params.group_id}`,

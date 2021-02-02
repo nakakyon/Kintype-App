@@ -114,11 +114,12 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
+import { Member, Attendance } from '@/datas/types'
 
 @Component({
   components: {},
 })
-export default class New extends Vue {
+export default class Edit extends Vue {
   plan: string = ''
   planItems: string[] = [
     '',
@@ -161,16 +162,17 @@ export default class New extends Vue {
       .doc(this.$route.params.member_id)
 
     member.get().then(snapshot => {
-      const getData: any = snapshot.data()
-      this.name = getData.name
-      if (this.$route.params.attend_date in getData) {
-        this.startTime = getData[this.$route.params.attend_date].start_time
-        this.endTime = getData[this.$route.params.attend_date].end_time
-        this.plan = getData[this.$route.params.attend_date].plan
-        this.reason = getData[this.$route.params.attend_date].reason
+      const mdata = snapshot.data() as Member
+      this.name = mdata.name
+      if (this.attendDate in mdata) {
+        const adata = mdata[this.attendDate] as Attendance
+        this.startTime = adata.start_time
+        this.endTime = adata.end_time
+        this.plan = adata.plan
+        this.reason = adata.reason
       } else {
-        this.startTime = getData.start_time
-        this.endTime = getData.end_time
+        this.startTime = mdata.start_time
+        this.endTime = mdata.end_time
       }
     })
   }
@@ -187,27 +189,30 @@ export default class New extends Vue {
       .collection('members')
       .doc(this.$route.params.member_id)
 
-    member.set(
-      {
-        [this.attendDate]: {
-          start_time: this.startTime,
-          end_time: this.endTime,
-          plan: this.plan,
-          reason: this.reason,
+    member
+      .set(
+        {
+          [this.attendDate]: {
+            start_time: this.startTime,
+            end_time: this.endTime,
+            plan: this.plan,
+            reason: this.reason,
+          },
         },
-      },
-      { merge: true }
-    )
-
-    if (this.attendDate === this.$moment(new Date()).format('YYYYMMDD')) {
-      this.$router.push({
-        path: `/${this.$route.params.group_id}`,
+        { merge: true }
+      )
+      .then(() => {
+        // @ts-ignore
+        if (this.attendDate === this.$moment(new Date()).format('YYYYMMDD')) {
+          this.$router.push({
+            path: `/${this.$route.params.group_id}`,
+          })
+        } else {
+          this.$router.push({
+            path: `/${this.$route.params.group_id}/attendances/${this.attendDate}`,
+          })
+        }
       })
-    } else {
-      this.$router.push({
-        path: `/${this.$route.params.group_id}/attendances/${this.attendDate}`,
-      })
-    }
   }
 }
 </script>

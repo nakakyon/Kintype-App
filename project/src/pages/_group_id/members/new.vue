@@ -4,7 +4,7 @@
       <v-row justify="center">
         <v-col cols="12" md="8">
           <v-text-field
-            v-model="userName"
+            v-model="name"
             label="名前*"
             outlined
             dense
@@ -99,7 +99,6 @@
         :timeout="10000"
         absolute
         centered
-        color="grey darken-1"
       >
         勤怠ページを作成しました<br />
         利用者の追加を行い、ページを共有しましょう
@@ -121,7 +120,7 @@ import firebase from '@/plugins/firebase'
   components: {},
 })
 export default class New extends Vue {
-  userName: string = ''
+  name: string = ''
   startTime: string = '09:00'
   endTime: string = '18:00'
   modal: boolean = false
@@ -149,12 +148,15 @@ export default class New extends Vue {
       .collection('groups')
       .doc(this.$route.params.group_id)
       .collection('members')
-    members.add({
-      name: this.userName,
-      start_time: this.startTime,
-      end_time: this.endTime,
-    })
-    this.$router.push({ path: `/${this.$route.params.group_id}/members` })
+    members
+      .add({
+        name: this.name,
+        start_time: this.startTime,
+        end_time: this.endTime,
+      })
+      .then(() =>
+        this.$router.push({ path: `/${this.$route.params.group_id}/members` })
+      )
   }
 }
 </script>

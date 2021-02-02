@@ -5,7 +5,7 @@ export default {
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     // titleTemplate: '%s - Kintype',
-    // title: '勤怠の連絡共有サービス',
+    // title: '勤怠の連絡サービス',
     title: 'Kintype',
     meta: [
       { charset: 'utf-8' },
@@ -83,6 +83,7 @@ export default {
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
     hardSource: true,
+    publicPath: '/assets/',
     extend(config: any, ctx: any) {
       // Run ESLint on save
       if (ctx.isDev && ctx.isClient) {

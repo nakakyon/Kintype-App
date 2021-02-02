@@ -26,7 +26,7 @@
                     ]"
                     class="font-weight-light"
                   >
-                    勤怠の連絡共有サービス
+                    勤怠の連絡サービス
                   </span>
                 </v-col>
 
@@ -49,7 +49,9 @@
       <div class="py-12"></div>
 
       <v-container class="text-center">
-        <h2 class="display-2 font-weight-bold mb-3">Kintypeとは</h2>
+        <h2 class="display-2 font-weight-bold mb-3">
+          Kintypeとは
+        </h2>
 
         <v-responsive class="mx-auto mb-8" width="56">
           <v-divider class="mb-1"></v-divider>
@@ -62,16 +64,18 @@
           max-width="720"
         >
           電話やメールで連絡していた勤怠を手軽に共有できるサービスです<br />
-          はじめに連絡を共有するための勤怠ページを作成しましょう
+          はじめに連絡を共有したい人たちと使う勤怠ページを作成しましょう
         </v-responsive>
       </v-container>
       <div class="py-6"></div>
     </section>
-    <section v-if="groupList.length > 0" id="recently" class="grey lighten-3">
+    <section v-if="groupList.length > 0" id="recently">
       <div class="py-6"></div>
 
       <v-container class="text-center">
-        <h2 class="display-2 font-weight-bold mb-3">最近閲覧したページ</h2>
+        <h2 class="display-2 font-weight-bold mb-3">
+          最近閲覧したページ
+        </h2>
 
         <v-responsive class="mx-auto mb-8" width="56">
           <v-divider class="mb-1"></v-divider>
@@ -79,38 +83,38 @@
           <v-divider></v-divider>
         </v-responsive>
 
-        <v-theme-provider light>
-          <v-row v-for="g in groupList" :key="g.id" justify="center">
-            <v-col cols="12" md="8">
-              <v-card
-                class="mx-auto"
-                outlined
-                tile
-                style="cursor: pointer"
-                @click="$router.push(g.route)"
-              >
-                <v-list-item>
-                  <v-list-item-content>
-                    <v-list-item-title>
-                      {{ g.name }}
-                    </v-list-item-title>
-                  </v-list-item-content>
-                  <v-list-item-icon>
-                    <v-icon>mdi-arrow-right</v-icon>
-                  </v-list-item-icon>
-                </v-list-item>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-theme-provider>
+        <!-- <v-theme-provider light> -->
+        <v-row v-for="g in groupList" :key="g.id" justify="center">
+          <v-col cols="12" md="8">
+            <v-card
+              class="mx-auto"
+              outlined
+              tile
+              style="cursor: pointer"
+              @click="$router.push(g.route)"
+            >
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ g.name }}
+                  </v-list-item-title>
+                </v-list-item-content>
+                <v-list-item-icon>
+                  <v-icon>mdi-arrow-right</v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-card>
+          </v-col>
+        </v-row>
+        <!-- </v-theme-provider> -->
       </v-container>
       <div class="py-6"></div>
     </section>
     <section id="create-page">
       <div class="py-6"></div>
 
-      <v-container>
-        <h2 class="display-2 font-weight-bold mb-3 text-uppercase text-center">
+      <v-container class="text-center">
+        <h2 class="display-2 font-weight-bold mb-3">
           勤怠ページ作成
         </h2>
 
@@ -144,7 +148,7 @@
             </v-col> -->
 
               <v-col cols="12" md="8" class="text-center">
-                <v-btn color="grey" outlined large @click="submit">
+                <v-btn color="grey" outlined @click="submit">
                   <span class="grey--text text--darken-1 font-weight-bold">
                     作成
                   </span>
@@ -163,6 +167,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
+import { Group } from '@/datas/types'
 
 @Component({
   layout: 'home',
@@ -179,6 +184,7 @@ export default class Index extends Vue {
   required = (v: string) => !!v || '入力して下さい'
 
   mounted() {
+    const db = firebase.firestore()
     for (let i = 0; i < localStorage.length; i++) {
       const key =
         localStorage.key(i) !== null ? (localStorage.key(i) as string) : ''
@@ -187,10 +193,18 @@ export default class Index extends Vue {
           ? JSON.parse(localStorage.getItem(key)!)
           : {}
       if (key.startsWith('kintype_app_')) {
-        this.groupList.push({
-          id: data.id,
-          name: data.name,
-          route: `/${data.id}`,
+        const group = db.collection('groups').doc(data.id)
+        group.get().then(snapshot => {
+          const gdata = snapshot.data() as Group
+          if (gdata) {
+            this.groupList.push({
+              id: data.id,
+              name: data.name,
+              route: `/${data.id}`,
+            })
+          } else {
+            localStorage.removeItem(key)
+          }
         })
       }
     }
@@ -210,6 +224,7 @@ export default class Index extends Vue {
         memo: '',
       })
       .then(ref => {
+        // @ts-ignore
         const expiration: Date = this.$moment(new Date())
           .add(1, 'M')
           .toDate()

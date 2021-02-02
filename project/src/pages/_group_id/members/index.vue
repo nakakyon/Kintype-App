@@ -34,11 +34,12 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
+import { Member } from '@/datas/types'
 
 @Component({
   components: {},
 })
-export default class New extends Vue {
+export default class Index extends Vue {
   memberList: {
     id: string
     name: string
@@ -57,11 +58,12 @@ export default class New extends Vue {
     const t = this
     members.get().then(function(snapShot) {
       snapShot.docs.map(doc => {
+        const data = doc.data() as Member
         t.memberList.push({
           id: doc.id,
-          name: doc.data().name,
-          startTime: doc.data().start_time,
-          endTime: doc.data().end_time,
+          name: data.name,
+          startTime: data.start_time,
+          endTime: data.end_time,
           route: `/${t.$route.params.group_id}/members/${doc.id}/edit`,
         })
       })
