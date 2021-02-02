@@ -1,93 +1,178 @@
 <template>
-  <v-app dark>
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
-      app
-    >
-      <v-list>
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-        >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-app-bar :clipped-left="clipped" fixed app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title" />
+  <v-app>
+    <v-app-bar fixed app>
+      <v-toolbar-title
+        class="font-weight-black"
+        style="cursor: pointer"
+        @click="$router.push('/')"
+        v-text="title"
+      />
       <v-spacer />
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      <template v-slot:extension>
+        <v-tabs v-model="activeTab" fixed-tabs>
+          <v-tab v-for="tab in tabs" :key="tab.id" :to="tab.route" exact>
+            {{ tab.name }}
+          </v-tab>
+        </v-tabs>
+      </template>
     </v-app-bar>
     <v-main>
       <v-container>
+        <v-theme-provider light>
+          <v-row justify="center">
+            <v-col cols="12" md="8">
+              <h2 class="headline font-weight-bold">
+                {{ pageName }}
+              </h2>
+            </v-col>
+          </v-row>
+        </v-theme-provider>
         <nuxt />
       </v-container>
     </v-main>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              mdi-repeat
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
+    <v-footer app :absolute="true">
+      <v-container>
+        <v-theme-provider light>
+          <v-row justify="center">
+            <v-col cols="12" md="8" class="pb-0">
+              <h2 class="headline font-weight-bold">
+                この勤怠ページのURL
+              </h2>
+              以下のURLをメール等を使って共有し、勤怠を連絡しましょう
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-text-field
+                v-model="copyUrl"
+                readonly
+                outlined
+                dense
+                background-color="white"
+              >
+                <template v-slot:append-outer>
+                  <v-btn color="grey" outlined @click="copyText">
+                    <span class="grey--text text--darken-1 font-weight-bold">
+                      コピー
+                    </span>
+                  </v-btn>
+                </template>
+              </v-text-field>
+            </v-col>
+          </v-row>
+        </v-theme-provider>
+      </v-container>
     </v-footer>
   </v-app>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/',
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
-        },
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js',
+<script lang="ts">
+import { Component, Vue } from 'nuxt-property-decorator'
+import firebase from '@/plugins/firebase'
+import { Group } from '@/datas/types'
+
+@Component({
+  components: {},
+})
+export default class Index extends Vue {
+  items: {
+    icon: string
+    title: string
+    to: string
+  }[] = []
+
+  title: string = 'Kintype'
+  activeTab: string = ''
+  tabs: {
+    id: number
+    name: string
+    route: string
+  }[] = []
+
+  pageName: string = ''
+  copyUrl: string = ''
+
+  localStorageItem?: {
+    id: string
+    name: string
+    expiry: Date
+  }
+
+  created() {
+    const db = firebase.firestore()
+    const group = db.collection('groups').doc(this.$route.params.group_id)
+    group.get().then(snapshot => {
+      const data = snapshot.data() as Group
+      if (data) {
+        this.pageName = data.name
+        // @ts-ignore
+        const expiration: Date = this.$moment(new Date())
+          .add(1, 'M')
+          .toDate()
+
+        this.localStorageItem = {
+          id: this.$route.params.group_id,
+          name: data.name,
+          expiry: expiration,
+        }
+      } else {
+        this.$router.push({ path: `/` })
+      }
+    })
+
+    if (
+      this.$route.path.endsWith(
+        `/${this.$route.params.group_id}/members/new`
+      ) ||
+      this.$route.path.endsWith(
+        `/${this.$route.params.group_id}/members/new/init`
+      )
+    ) {
+      this.activeTab = `/${this.$route.params.group_id}/members/new`
+    } else if (
+      this.$route.path.indexOf(`/${this.$route.params.group_id}/members`) === 0
+    ) {
+      this.activeTab = `/${this.$route.params.group_id}/members`
+    } else {
+      this.activeTab = `/${this.$route.params.group_id}`
     }
-  },
+
+    this.tabs = [
+      {
+        id: 1,
+        name: '勤怠入力',
+        route: `/${this.$route.params.group_id}`,
+      },
+      {
+        id: 2,
+        name: '利用者一覧',
+        route: `/${this.$route.params.group_id}/members`,
+      },
+      {
+        id: 3,
+        name: '利用者追加',
+        route: `/${this.$route.params.group_id}/members/new`,
+      },
+    ]
+  }
+
+  mounted() {
+    this.copyUrl = `${window.location.origin}/${this.$route.params.group_id}`
+    if (this.localStorageItem) {
+      localStorage.setItem(
+        `kintype_app_${this.$route.params.group_id}`,
+        JSON.stringify(this.localStorageItem)
+      )
+    }
+  }
+
+  copyText(): void {
+    // @ts-ignore
+    this.$copyText(this.copyUrl)
+  }
 }
 </script>
+
+<style>
+.v-text-field.v-text-field--outlined .v-input__append-outer {
+  margin-top: 2px !important;
+}
+</style>
