@@ -2,6 +2,7 @@
   <v-app>
     <v-app-bar fixed app>
       <v-toolbar-title
+        class="font-weight-black"
         style="cursor: pointer"
         @click="$router.push('/')"
         v-text="title"
@@ -66,6 +67,7 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
+import { Group } from '@/datas/types'
 
 @Component({
   components: {},
@@ -88,13 +90,29 @@ export default class Index extends Vue {
   pageName: string = ''
   copyUrl: string = ''
 
+  localStorageItem?: {
+    id: string
+    name: string
+    expiry: Date
+  }
+
   created() {
     const db = firebase.firestore()
     const group = db.collection('groups').doc(this.$route.params.group_id)
     group.get().then(snapshot => {
-      const getData: any = snapshot.data()
-      if (getData) {
-        this.pageName = getData.name
+      const data = snapshot.data() as Group
+      if (data) {
+        this.pageName = data.name
+        // @ts-ignore
+        const expiration: Date = this.$moment(new Date())
+          .add(1, 'M')
+          .toDate()
+
+        this.localStorageItem = {
+          id: this.$route.params.group_id,
+          name: data.name,
+          expiry: expiration,
+        }
       } else {
         this.$router.push({ path: `/` })
       }
@@ -138,9 +156,16 @@ export default class Index extends Vue {
 
   mounted() {
     this.copyUrl = `${window.location.origin}/${this.$route.params.group_id}`
+    if (this.localStorageItem) {
+      localStorage.setItem(
+        `kintype_app_${this.$route.params.group_id}`,
+        JSON.stringify(this.localStorageItem)
+      )
+    }
   }
 
   copyText(): void {
+    // @ts-ignore
     this.$copyText(this.copyUrl)
   }
 }

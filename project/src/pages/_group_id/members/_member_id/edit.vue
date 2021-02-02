@@ -4,7 +4,7 @@
       <v-row justify="center">
         <v-col cols="12" md="8">
           <v-text-field
-            v-model="userName"
+            v-model="name"
             label="名前*"
             outlined
             dense
@@ -105,12 +105,13 @@
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
+import { Member } from '@/datas/types'
 
 @Component({
   components: {},
 })
-export default class New extends Vue {
-  userName: string = ''
+export default class Edit extends Vue {
+  name: string = ''
   startTime: string = ''
   endTime: string = ''
   modal: boolean = false
@@ -130,11 +131,11 @@ export default class New extends Vue {
       .doc(this.$route.params.member_id)
 
     member.get().then(snapshot => {
-      const getData: any = snapshot.data()
-      if (getData) {
-        this.userName = getData.name
-        this.startTime = getData.start_time
-        this.endTime = getData.end_time
+      const data = snapshot.data() as Member
+      if (data) {
+        this.name = data.name
+        this.startTime = data.start_time
+        this.endTime = data.end_time
       } else {
         this.$router.push({ path: `/` })
       }
@@ -153,15 +154,18 @@ export default class New extends Vue {
       .collection('members')
       .doc(this.$route.params.member_id)
 
-    member.set(
-      {
-        name: this.userName,
-        start_time: this.startTime,
-        end_time: this.endTime,
-      },
-      { merge: true }
-    )
-    this.$router.push({ path: `/${this.$route.params.group_id}/members` })
+    member
+      .set(
+        {
+          name: this.name,
+          start_time: this.startTime,
+          end_time: this.endTime,
+        },
+        { merge: true }
+      )
+      .then(() =>
+        this.$router.push({ path: `/${this.$route.params.group_id}/members` })
+      )
   }
 
   del() {
@@ -171,7 +175,9 @@ export default class New extends Vue {
       .collection('members')
       .doc(this.$route.params.member_id)
       .delete()
-    this.$router.push({ path: `/${this.$route.params.group_id}/members` })
+      .then(() =>
+        this.$router.push({ path: `/${this.$route.params.group_id}/members` })
+      )
   }
 }
 </script>
