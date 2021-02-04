@@ -178,8 +178,7 @@ export default class Edit extends Vue {
   }
 
   submit() {
-    // eslint-disable-next-line
-    if(!(this.$refs as any).form.validate()){
+    if (!(this.$refs as any).form.validate()) {
       return
     }
     const db = firebase.firestore()

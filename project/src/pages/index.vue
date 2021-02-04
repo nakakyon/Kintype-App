@@ -211,8 +211,7 @@ export default class Index extends Vue {
   }
 
   submit(): void {
-    // eslint-disable-next-line
-    if(!(this.$refs as any).form.validate()){
+    if (!(this.$refs as any).form.validate()) {
       return
     }
 
