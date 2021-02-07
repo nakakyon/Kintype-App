@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar fixed app>
+    <v-app-bar fixed app color="#e3bf00">
       <v-toolbar-title
         class="font-weight-black"
         style="cursor: pointer"
@@ -9,8 +9,14 @@
       />
       <v-spacer />
       <template v-slot:extension>
-        <v-tabs v-model="activeTab" fixed-tabs>
-          <v-tab v-for="tab in tabs" :key="tab.id" :to="tab.route" exact>
+        <v-tabs v-model="activeTab" fixed-tabs color="black">
+          <v-tab
+            v-for="tab in tabs"
+            :key="tab.id"
+            :to="tab.route"
+            exact
+            color="black"
+          >
             {{ tab.name }}
           </v-tab>
         </v-tabs>
@@ -35,10 +41,12 @@
         <v-theme-provider light>
           <v-row justify="center">
             <v-col cols="12" md="8" class="pb-0">
-              <h2 class="headline font-weight-bold">
+              <h2 class="headline font-weight-bold heading-border mb-3">
                 この勤怠ページのURL
               </h2>
-              以下のURLをメール等を使って共有し、勤怠を連絡しましょう
+              <p class="mb-0">
+                以下のURLをメール等を使って共有し、勤怠を連絡しましょう
+              </p>
             </v-col>
             <v-col cols="12" md="8">
               <v-text-field
@@ -174,5 +182,10 @@ export default class Index extends Vue {
 <style>
 .v-text-field.v-text-field--outlined .v-input__append-outer {
   margin-top: 2px !important;
+}
+.heading-border {
+  border-image: linear-gradient(0.25turn, #e3bf00 100px, #111 100px) 1/0 0 5px 0;
+  border-bottom: solid;
+  display: inline-block;
 }
 </style>

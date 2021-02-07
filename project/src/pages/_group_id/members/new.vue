@@ -99,11 +99,13 @@
         :timeout="10000"
         absolute
         centered
+        color="#e3bf00"
+        content-class="snackbar-font-color"
       >
         勤怠ページを作成しました<br />
         利用者の追加を行い、ページを共有しましょう
         <template v-slot:action="{ attrs }">
-          <v-btn text v-bind="attrs" @click="snackbar = false">
+          <v-btn text v-bind="attrs" color="black" @click="snackbar = false">
             Close
           </v-btn>
         </template>
@@ -139,8 +141,7 @@ export default class New extends Vue {
   }
 
   submit() {
-    // eslint-disable-next-line
-    if(!(this.$refs as any).form.validate()){
+    if (!(this.$refs as any).form.validate()) {
       return
     }
     const db = firebase.firestore()
@@ -160,3 +161,8 @@ export default class New extends Vue {
   }
 }
 </script>
+<style>
+.snackbar-font-color {
+  color: #000;
+}
+</style>
