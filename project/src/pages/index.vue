@@ -49,15 +49,15 @@
       <div class="py-12"></div>
 
       <v-container class="text-center">
-        <h2 class="display-2 font-weight-bold mb-3">
+        <h2 class="display-2 font-weight-bold mb-12 heading-border">
           Kintypeとは
         </h2>
 
-        <v-responsive class="mx-auto mb-8" width="56">
+        <!-- <v-responsive class="mx-auto mb-8" width="56">
           <v-divider class="mb-1"></v-divider>
 
           <v-divider></v-divider>
-        </v-responsive>
+        </v-responsive> -->
 
         <v-responsive
           class="mx-auto title font-weight-light mb-8"
@@ -73,15 +73,15 @@
       <div class="py-6"></div>
 
       <v-container class="text-center">
-        <h2 class="display-2 font-weight-bold mb-3">
+        <h2 class="display-2 font-weight-bold mb-12 heading-border">
           最近閲覧したページ
         </h2>
 
-        <v-responsive class="mx-auto mb-8" width="56">
+        <!-- <v-responsive class="mx-auto mb-8" width="56">
           <v-divider class="mb-1"></v-divider>
 
           <v-divider></v-divider>
-        </v-responsive>
+        </v-responsive> -->
 
         <!-- <v-theme-provider light> -->
         <v-row v-for="g in groupList" :key="g.id" justify="center">
@@ -114,15 +114,15 @@
       <div class="py-6"></div>
 
       <v-container class="text-center">
-        <h2 class="display-2 font-weight-bold mb-3">
+        <h2 class="display-2 font-weight-bold mb-12 heading-border">
           勤怠ページ作成
         </h2>
 
-        <v-responsive class="mx-auto mb-12" width="56">
+        <!-- <v-responsive class="mx-auto mb-12" width="56">
           <v-divider class="mb-1"></v-divider>
 
           <v-divider></v-divider>
-        </v-responsive>
+        </v-responsive> -->
 
         <v-theme-provider light>
           <v-form ref="form">
@@ -165,14 +165,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'nuxt-property-decorator'
+import { Vue, Component } from 'nuxt-property-decorator'
+import { ComponentOptions } from 'vue'
 import firebase from '@/plugins/firebase'
 import { Group } from '@/datas/types'
 
 @Component({
   layout: 'home',
   components: {},
-})
+} as ComponentOptions<Vue>)
 export default class Index extends Vue {
   groupName: string = ''
   groupList: {
@@ -211,8 +212,7 @@ export default class Index extends Vue {
   }
 
   submit(): void {
-    // eslint-disable-next-line
-    if(!(this.$refs as any).form.validate()){
+    if (!(this.$refs as any).form.validate()) {
       return
     }
 
@@ -241,3 +241,10 @@ export default class Index extends Vue {
   }
 }
 </script>
+<style>
+.heading-border {
+  border-image: linear-gradient(0.25turn, #e3bf00 100px, #111 100px) 1/0 0 5px 0;
+  border-bottom: solid;
+  display: inline-block;
+}
+</style>

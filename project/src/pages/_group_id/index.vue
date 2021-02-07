@@ -15,10 +15,12 @@
           absolute
           centered
           style="white-space: pre-wrap;"
+          color="#e3bf00"
+          content-class="snackbar-font-color"
         >
           <span>{{ text }}</span>
           <template v-slot:action="{ attrs }">
-            <v-btn text v-bind="attrs" @click="snackbar = false">
+            <v-btn text v-bind="attrs" color="black" @click="snackbar = false">
               Close
             </v-btn>
           </template>
@@ -242,7 +244,8 @@ export default class Index extends Vue {
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-  background-color: lime;
+  /* background-color: lime; */
+  background-color: #e3bf00;
 }
 .l-border {
   border-left: 1px solid lightgray;
@@ -262,5 +265,8 @@ export default class Index extends Vue {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
+}
+.snackbar-font-color {
+  color: #000;
 }
 </style>
