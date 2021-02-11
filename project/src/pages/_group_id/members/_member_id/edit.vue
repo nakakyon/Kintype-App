@@ -106,6 +106,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
 import { Member } from '@/datas/types'
+import { Context } from '@nuxt/types'
 
 @Component({
   components: {},
@@ -122,39 +123,35 @@ export default class Edit extends Vue {
     return this.startTime < this.endTime || '時間を見直して下さい'
   }
 
-  created() {
+  async asyncData(context: Context) {
     const db = firebase.firestore()
     const member = db
       .collection('groups')
-      .doc(this.$route.params.group_id)
+      .doc(context.params.group_id)
       .collection('members')
-      .doc(this.$route.params.member_id)
+      .doc(context.params.member_id)
 
-    member.get().then(snapshot => {
-      const data = snapshot.data() as Member
-      if (data) {
-        this.name = data.name
-        this.startTime = data.start_time
-        this.endTime = data.end_time
-      } else {
-        this.$router.push({ path: `/` })
-      }
-    })
+    const snapshot = await member.get()
+    const data = snapshot.data() as Member
+    if (data) {
+      const name = data.name
+      const startTime = data.start_time
+      const endTime = data.end_time
+      return { name, startTime, endTime }
+    }
   }
 
-  submit() {
+  async submit() {
     // eslint-disable-next-line
     if(!(this.$refs as any).form.validate()){
       return
     }
     const db = firebase.firestore()
-    const member = db
+    await db
       .collection('groups')
       .doc(this.$route.params.group_id)
       .collection('members')
       .doc(this.$route.params.member_id)
-
-    member
       .set(
         {
           name: this.name,
@@ -163,21 +160,18 @@ export default class Edit extends Vue {
         },
         { merge: true }
       )
-      .then(() =>
-        this.$router.push({ path: `/${this.$route.params.group_id}/members` })
-      )
+    this.$router.push({ path: `/${this.$route.params.group_id}/members` })
   }
 
-  del() {
+  async del() {
     const db = firebase.firestore()
-    db.collection('groups')
+    await db
+      .collection('groups')
       .doc(this.$route.params.group_id)
       .collection('members')
       .doc(this.$route.params.member_id)
       .delete()
-      .then(() =>
-        this.$router.push({ path: `/${this.$route.params.group_id}/members` })
-      )
+    this.$router.push({ path: `/${this.$route.params.group_id}/members` })
   }
 }
 </script>

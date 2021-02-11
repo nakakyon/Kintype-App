@@ -184,8 +184,9 @@ export default class Index extends Vue {
 
   required = (v: string) => !!v || '入力して下さい'
 
-  mounted() {
+  async mounted() {
     const db = firebase.firestore()
+    const removeItems = []
     for (let i = 0; i < localStorage.length; i++) {
       const key =
         localStorage.key(i) !== null ? (localStorage.key(i) as string) : ''
@@ -194,50 +195,54 @@ export default class Index extends Vue {
           ? JSON.parse(localStorage.getItem(key)!)
           : {}
       if (key.startsWith('kintype_app_')) {
-        const group = db.collection('groups').doc(data.id)
-        group.get().then(snapshot => {
-          const gdata = snapshot.data() as Group
-          if (gdata) {
-            this.groupList.push({
-              id: data.id,
-              name: data.name,
-              route: `/${data.id}`,
-            })
-          } else {
-            localStorage.removeItem(key)
-          }
-        })
+        const group = await db
+          .collection('groups')
+          .doc(data.id)
+          .get()
+        const gdata = group.data() as Group
+        if (gdata) {
+          this.groupList.push({
+            id: data.id,
+            name: gdata.name,
+            route: `/${data.id}`,
+          })
+          this.setLocalStorageItem(data.id, gdata.name)
+        } else {
+          removeItems.push(key)
+        }
       }
     }
+    removeItems.map(value => {
+      localStorage.removeItem(value)
+    })
   }
 
-  submit(): void {
+  async submit() {
     if (!(this.$refs as any).form.validate()) {
       return
     }
 
     const db = firebase.firestore()
-    const groups = db.collection('groups')
-    groups
-      .add({
-        name: this.groupName,
-        memo: '',
-      })
-      .then(ref => {
-        // @ts-ignore
-        const expiration: Date = this.$moment(new Date())
-          .add(1, 'M')
-          .toDate()
-        const item = {
-          id: ref.id,
-          name: this.groupName,
-          expiry: expiration,
-        }
-        localStorage.setItem(`kintype_app_${ref.id}`, JSON.stringify(item))
-        this.$router.push({
-          path: `/${ref.id}/members/new/init`,
-        })
-      })
+    const group = await db.collection('groups').add({
+      name: this.groupName,
+      memo: '',
+    })
+    this.setLocalStorageItem(group.id, this.groupName)
+    this.$router.push({
+      path: `/${group.id}/members/new/init`,
+    })
+  }
+
+  setLocalStorageItem(id: string, name: string) {
+    const expiry: Date = this.$moment(new Date())
+      .add(1, 'M')
+      .toDate()
+    const item = {
+      id,
+      name,
+      expiry,
+    }
+    localStorage.setItem(`kintype_app_${id}`, JSON.stringify(item))
   }
 }
 </script>
