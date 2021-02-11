@@ -24,13 +24,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: project - yarn install, generate
-    - working-directory: ./project
-    - run: yarn install
-    - run: yarn build-nuxt
+      working-directory: ./project
+      run: | 
+            yarn install
+            yarn build-nuxt
       
     - name: functions - yarn install
-    - working-directory: ./project/functions
-    - run: yarn install
+      working-directory: ./project/functions
+      run: yarn install
       
     - name: deploy to Firebase Hosting
       uses: w9jds/firebase-action@master
