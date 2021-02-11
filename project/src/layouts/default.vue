@@ -117,7 +117,6 @@ export default class Index extends Vue {
     const data = snapshot.data() as Group
     if (data) {
       this.pageName = data.name
-      // @ts-ignore
       const expiration: Date = this.$moment(new Date())
         .add(1, 'M')
         .toDate()
@@ -178,7 +177,6 @@ export default class Index extends Vue {
   }
 
   copyText() {
-    // @ts-ignore
     this.$copyText(this.copyUrl)
   }
 }

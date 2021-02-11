@@ -3,9 +3,7 @@
     <v-form ref="form">
       <v-row justify="center">
         <v-col cols="12" md="8">
-          {{ name }}さんの{{
-            this.$moment(attendDate).format('YYYY/MM/DD(ddd)')
-          }}の勤怠
+          {{ name }}さんの{{ this.$timeYMDLabel(attendDate) }}の勤怠
         </v-col>
         <v-col cols="12" md="8">
           <v-select
@@ -203,8 +201,7 @@ export default class Edit extends Vue {
         },
         { merge: true }
       )
-    // @ts-ignore
-    if (this.attendDate === this.$moment(new Date()).format('YYYYMMDD')) {
+    if (this.attendDate === this.$timeYMD()) {
       this.$router.push({
         path: `/${this.$route.params.group_id}`,
       })

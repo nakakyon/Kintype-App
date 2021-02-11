@@ -234,7 +234,6 @@ export default class Index extends Vue {
   }
 
   setLocalStorageItem(id: string, name: string) {
-    // @ts-ignore
     const expiry: Date = this.$moment(new Date())
       .add(1, 'M')
       .toDate()

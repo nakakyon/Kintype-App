@@ -144,7 +144,7 @@ export default class Index extends Vue {
     const workBreaks = ['有給休暇', '振替休日', '代休', '特別有休', '欠勤']
     const attendDate = context.params.selected_date
       ? context.params.selected_date
-      : `${context.app.$moment(new Date()).format('YYYYMMDD')}`
+      : `${context.app.$timeYMD()}`
 
     const attendanceList: {
       id: string
@@ -191,8 +191,7 @@ export default class Index extends Vue {
       this.attendDate = this.$route.params.selected_date
       this.dateSelect = this.createDateObject(this.attendDate)
     } else {
-      // @ts-ignore
-      this.attendDate = `${this.$moment(new Date()).format('YYYYMMDD')}`
+      this.attendDate = `${this.$timeYMD()}`
       this.dateSelect = this.createDateObject(new Date())
     }
     this.createDateItems()
@@ -214,16 +213,13 @@ export default class Index extends Vue {
 
   createDateObject(d: Date | string) {
     return {
-      // @ts-ignore
-      label: `${this.$moment(d).format('YYYY/MM/DD(ddd)')}`,
-      // @ts-ignore
-      value: `${this.$moment(d).format('YYYYMMDD')}`,
+      label: `${this.$timeYMDLabel(d)}`,
+      value: `${this.$timeYMD(d)}`,
     }
   }
 
   changeRoute(value: string) {
-    // @ts-ignore
-    if (value === this.$moment(new Date()).format('YYYYMMDD')) {
+    if (value === this.$timeYMD()) {
       this.$router.push({
         path: `/${this.$route.params.group_id}`,
       })
