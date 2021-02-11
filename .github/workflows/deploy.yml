@@ -34,7 +34,10 @@ jobs:
     - name: project - yarn generate
       working-directory: ./project
       run: yarn build-nuxt
-      
+    
+    - name: functions - change directory
+      working-directory: ./project/functions
+
     - name: deploy to Firebase Hosting
       uses: w9jds/firebase-action@master
       with:
