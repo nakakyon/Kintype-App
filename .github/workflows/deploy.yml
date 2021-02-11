@@ -35,12 +35,10 @@ jobs:
       working-directory: ./project
       run: yarn build-nuxt
     
-    - name: functions - change directory
-      working-directory: ./project/functions
-
     - name: deploy to Firebase Hosting
       uses: w9jds/firebase-action@master
       with:
         args: deploy
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        PROJECT_PATH: ./project/functions
