@@ -15,17 +15,15 @@
           absolute
           centered
           style="white-space: pre-wrap;"
-          color="#e3bf00"
-          content-class="snackbar-font-color"
         >
           <span>{{ text }}</span>
           <template v-slot:action="{ attrs }">
-            <v-btn text v-bind="attrs" color="black" @click="snackbar = false">
+            <v-btn text v-bind="attrs" @click="snackbar = false">
               Close
             </v-btn>
           </template>
         </v-snackbar>
-        <v-col cols="12" md="8" class="pb-0">
+        <v-col cols="12" md="8" class="ma-0 pa-0">
           <span class="attend-date-select">
             <v-select
               v-model="dateSelect"
@@ -34,7 +32,7 @@
               item-value="value"
               dense
               outlined
-              style="width: 350px"
+              style="width: 370px"
               class="ma-0 pa-0"
               @input="changeRoute"
             >
@@ -104,6 +102,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
 import { Member, Attendance } from '@/datas/types'
+import { Context } from '@nuxt/types'
 
 @Component({
   components: {},
@@ -133,87 +132,90 @@ export default class Index extends Vue {
   snackbar: boolean = false
   text: string = ''
 
-  displaySnackbar(reason: string) {
-    this.text = reason
-    this.snackbar = true
-  }
-
-  created() {
-    this.createDateItems()
-
+  async asyncData(context: Context) {
     const db = firebase.firestore()
     const members = db
       .collection('groups')
-      .doc(this.$route.params.group_id)
+      .doc(context.params.group_id)
       .collection('members')
 
-    const t = this
+    const snapShot = await members.get()
+
     const workBreaks = ['有給休暇', '振替休日', '代休', '特別有休', '欠勤']
-    members.get().then(function(snapShot) {
-      snapShot.docs.map(doc => {
-        const mdata = doc.data() as Member
-        if (t.attendDate in mdata) {
-          const adata = mdata[t.attendDate] as Attendance
-          t.attendanceList.push({
-            id: doc.id,
-            name: mdata.name,
-            startTime: workBreaks.includes(adata.plan)
-              ? '--:--'
-              : adata.start_time,
-            endTime: workBreaks.includes(adata.plan) ? '--:--' : adata.end_time,
-            plan: adata.plan,
-            reason: adata.reason,
-            route: `/${t.$route.params.group_id}/attendances/${t.attendDate}/${doc.id}/edit`,
-          })
-        } else {
-          t.attendanceList.push({
-            id: doc.id,
-            name: mdata.name,
-            startTime: mdata.start_time,
-            endTime: mdata.end_time,
-            plan: '未定',
-            reason: '',
-            route: `/${t.$route.params.group_id}/attendances/${t.attendDate}/${doc.id}/edit`,
-          })
-        }
-      })
+    const attendDate = context.params.selected_date
+      ? context.params.selected_date
+      : `${context.app.$moment(new Date()).format('YYYYMMDD')}`
+
+    const attendanceList: {
+      id: string
+      name: string
+      startTime: string
+      endTime: string
+      plan: string
+      reason: string
+      route: string
+    }[] = []
+
+    snapShot.docs.map(doc => {
+      const mdata = doc.data() as Member
+      if (attendDate in mdata) {
+        const adata = mdata[attendDate] as Attendance
+        attendanceList.push({
+          id: doc.id,
+          name: mdata.name,
+          startTime: workBreaks.includes(adata.plan)
+            ? '--:--'
+            : adata.start_time,
+          endTime: workBreaks.includes(adata.plan) ? '--:--' : adata.end_time,
+          plan: adata.plan,
+          reason: adata.reason,
+          route: `/${context.params.group_id}/attendances/${attendDate}/${doc.id}/edit`,
+        })
+      } else {
+        attendanceList.push({
+          id: doc.id,
+          name: mdata.name,
+          startTime: mdata.start_time,
+          endTime: mdata.end_time,
+          plan: '未定',
+          reason: '',
+          route: `/${context.params.group_id}/attendances/${attendDate}/${doc.id}/edit`,
+        })
+      }
     })
+    return { attendanceList }
   }
 
-  createDateItems() {
+  created() {
     if (this.$route.params.selected_date) {
-      const str = this.$route.params.selected_date
-      this.attendDate = str
-      this.dateSelect = {
-        label:
-          str.substr(0, 4) + '/' + str.substr(4, 2) + '/' + str.substr(6, 2),
-        value: str,
-      }
+      this.attendDate = this.$route.params.selected_date
+      this.dateSelect = this.createDateObject(this.attendDate)
     } else {
       // @ts-ignore
       this.attendDate = `${this.$moment(new Date()).format('YYYYMMDD')}`
       this.dateSelect = this.createDateObject(new Date())
     }
+    this.createDateItems()
+  }
 
-    if (this.dateItems.length > 0) {
-      return
-    }
+  createDateItems() {
+    if (this.dateItems.length === 0) {
+      const start = new Date()
+      const end = new Date()
+      start.setDate(start.getDate() - 3)
+      end.setDate(end.getDate() + 3)
 
-    const start = new Date()
-    const end = new Date()
-    start.setDate(start.getDate() - 3)
-    end.setDate(end.getDate() + 3)
-
-    // eslint-disable-next-line no-unmodified-loop-condition
-    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-      this.dateItems.push(this.createDateObject(d))
+      // eslint-disable-next-line no-unmodified-loop-condition
+      for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+        this.dateItems.push(this.createDateObject(d))
+      }
     }
   }
 
-  createDateObject(d: Date) {
+  createDateObject(d: Date | string) {
     return {
       // @ts-ignore
-      label: `${this.$moment(d).format('YYYY/MM/DD')}`,
+      label: `${this.$moment(d).format('YYYY/MM/DD(ddd)')}`,
       // @ts-ignore
       value: `${this.$moment(d).format('YYYYMMDD')}`,
     }
@@ -230,6 +232,11 @@ export default class Index extends Vue {
         path: `/${this.$route.params.group_id}/attendances/${value}`,
       })
     }
+  }
+
+  displaySnackbar(reason: string) {
+    this.text = reason
+    this.snackbar = true
   }
 }
 </script>
@@ -265,8 +272,5 @@ export default class Index extends Vue {
   align-items: center;
   -webkit-justify-content: center;
   justify-content: center;
-}
-.snackbar-font-color {
-  color: #000;
 }
 </style>

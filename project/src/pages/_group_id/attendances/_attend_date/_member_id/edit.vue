@@ -115,6 +115,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
 import { Member, Attendance } from '@/datas/types'
+import { Context } from '@nuxt/types'
 
 @Component({
   components: {},
@@ -151,44 +152,46 @@ export default class Edit extends Vue {
     return this.startTime < this.endTime || '時間を見直して下さい'
   }
 
-  created() {
-    this.attendDate = this.$route.params.attend_date
-
+  async asyncData(context: Context) {
+    const attendDate = context.params.attend_date
     const db = firebase.firestore()
     const member = db
       .collection('groups')
-      .doc(this.$route.params.group_id)
+      .doc(context.params.group_id)
       .collection('members')
-      .doc(this.$route.params.member_id)
+      .doc(context.params.member_id)
 
-    member.get().then(snapshot => {
-      const mdata = snapshot.data() as Member
-      this.name = mdata.name
-      if (this.attendDate in mdata) {
-        const adata = mdata[this.attendDate] as Attendance
-        this.startTime = adata.start_time
-        this.endTime = adata.end_time
-        this.plan = adata.plan
-        this.reason = adata.reason
-      } else {
-        this.startTime = mdata.start_time
-        this.endTime = mdata.end_time
-      }
-    })
+    const snapshot = await member.get()
+    const mdata = snapshot.data() as Member
+    const name = mdata.name
+    if (attendDate in mdata) {
+      const adata = mdata[attendDate] as Attendance
+      const startTime = adata.start_time
+      const endTime = adata.end_time
+      const plan = adata.plan
+      const reason = adata.reason
+      return { name, startTime, endTime, plan, reason }
+    } else {
+      const startTime = mdata.start_time
+      const endTime = mdata.end_time
+      return { name, startTime, endTime }
+    }
   }
 
-  submit() {
+  created() {
+    this.attendDate = this.$route.params.attend_date
+  }
+
+  async submit() {
     if (!(this.$refs as any).form.validate()) {
       return
     }
     const db = firebase.firestore()
-    const member = db
+    await db
       .collection('groups')
       .doc(this.$route.params.group_id)
       .collection('members')
       .doc(this.$route.params.member_id)
-
-    member
       .set(
         {
           [this.attendDate]: {
@@ -200,18 +203,16 @@ export default class Edit extends Vue {
         },
         { merge: true }
       )
-      .then(() => {
-        // @ts-ignore
-        if (this.attendDate === this.$moment(new Date()).format('YYYYMMDD')) {
-          this.$router.push({
-            path: `/${this.$route.params.group_id}`,
-          })
-        } else {
-          this.$router.push({
-            path: `/${this.$route.params.group_id}/attendances/${this.attendDate}`,
-          })
-        }
+    // @ts-ignore
+    if (this.attendDate === this.$moment(new Date()).format('YYYYMMDD')) {
+      this.$router.push({
+        path: `/${this.$route.params.group_id}`,
       })
+    } else {
+      this.$router.push({
+        path: `/${this.$route.params.group_id}/attendances/${this.attendDate}`,
+      })
+    }
   }
 }
 </script>

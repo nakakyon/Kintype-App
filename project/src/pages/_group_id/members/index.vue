@@ -35,6 +35,7 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
 import { Member } from '@/datas/types'
+import { Context } from '@nuxt/types'
 
 @Component({
   components: {},
@@ -48,26 +49,33 @@ export default class Index extends Vue {
     route: string
   }[] = []
 
-  created() {
+  async asyncData(context: Context) {
     const db = firebase.firestore()
     const members = db
       .collection('groups')
-      .doc(this.$route.params.group_id)
+      .doc(context.params.group_id)
       .collection('members')
 
-    const t = this
-    members.get().then(function(snapShot) {
-      snapShot.docs.map(doc => {
-        const data = doc.data() as Member
-        t.memberList.push({
-          id: doc.id,
-          name: data.name,
-          startTime: data.start_time,
-          endTime: data.end_time,
-          route: `/${t.$route.params.group_id}/members/${doc.id}/edit`,
-        })
+    const memberList: {
+      id: string
+      name: string
+      startTime: string
+      endTime: string
+      route: string
+    }[] = []
+
+    const snapShot = await members.get()
+    snapShot.docs.map(doc => {
+      const data = doc.data() as Member
+      memberList.push({
+        id: doc.id,
+        name: data.name,
+        startTime: data.start_time,
+        endTime: data.end_time,
+        route: `/${context.params.group_id}/members/${doc.id}/edit`,
       })
     })
+    return { memberList }
   }
 }
 </script>

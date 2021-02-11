@@ -48,7 +48,7 @@
                 以下のURLをメール等を使って共有し、勤怠を連絡しましょう
               </p>
             </v-col>
-            <v-col cols="12" md="8">
+            <v-col cols="12" md="8" class="pb-0">
               <v-text-field
                 v-model="copyUrl"
                 readonly
@@ -64,6 +64,12 @@
                   </v-btn>
                 </template>
               </v-text-field>
+            </v-col>
+            <v-col cols="12" md="8">
+              勤怠ページの編集は<nuxt-link
+                :to="`/${$route.params.group_id}/edit`"
+                >こちら</nuxt-link
+              >から
             </v-col>
           </v-row>
         </v-theme-provider>
@@ -104,27 +110,26 @@ export default class Index extends Vue {
     expiry: Date
   }
 
-  created() {
+  async created() {
     const db = firebase.firestore()
     const group = db.collection('groups').doc(this.$route.params.group_id)
-    group.get().then(snapshot => {
-      const data = snapshot.data() as Group
-      if (data) {
-        this.pageName = data.name
-        // @ts-ignore
-        const expiration: Date = this.$moment(new Date())
-          .add(1, 'M')
-          .toDate()
+    const snapshot = await group.get()
+    const data = snapshot.data() as Group
+    if (data) {
+      this.pageName = data.name
+      // @ts-ignore
+      const expiration: Date = this.$moment(new Date())
+        .add(1, 'M')
+        .toDate()
 
-        this.localStorageItem = {
-          id: this.$route.params.group_id,
-          name: data.name,
-          expiry: expiration,
-        }
-      } else {
-        this.$router.push({ path: `/` })
+      this.localStorageItem = {
+        id: this.$route.params.group_id,
+        name: data.name,
+        expiry: expiration,
       }
-    })
+    } else {
+      this.$router.push({ path: `/` })
+    }
 
     if (
       this.$route.path.endsWith(
@@ -172,7 +177,7 @@ export default class Index extends Vue {
     }
   }
 
-  copyText(): void {
+  copyText() {
     // @ts-ignore
     this.$copyText(this.copyUrl)
   }
