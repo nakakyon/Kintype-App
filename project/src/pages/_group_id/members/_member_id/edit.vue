@@ -11,79 +11,12 @@
             :rules="[required]"
           ></v-text-field>
         </v-col>
-
         <v-col cols="12" md="8">
-          <v-row>
-            <v-col cols="6">
-              <v-dialog
-                ref="dialog"
-                v-model="modal"
-                :return-value.sync="startTime"
-                persistent
-                width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="startTime"
-                    label="基本出社時間"
-                    readonly
-                    v-bind="attrs"
-                    outlined
-                    dense
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-time-picker v-if="modal" v-model="startTime" full-width>
-                  <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="modal = false"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="$refs.dialog.save(startTime)"
-                  >
-                    OK
-                  </v-btn>
-                </v-time-picker>
-              </v-dialog>
-            </v-col>
-            <v-col cols="6">
-              <v-dialog
-                ref="dialog2"
-                v-model="modal2"
-                :return-value.sync="endTime"
-                persistent
-                width="290px"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    v-model="endTime"
-                    label="基本退社時間"
-                    readonly
-                    v-bind="attrs"
-                    outlined
-                    dense
-                    :rules="[dateIntegrity]"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-time-picker v-if="modal2" v-model="endTime" full-width>
-                  <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="modal2 = false"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="$refs.dialog2.save(endTime)"
-                  >
-                    OK
-                  </v-btn>
-                </v-time-picker>
-              </v-dialog>
-            </v-col>
-          </v-row>
+          <start-end-time
+            label-prefix="基本"
+            :start-time.sync="startTime"
+            :end-time.sync="endTime"
+          ></start-end-time>
         </v-col>
         <v-col cols="12" md="8" class="text-center">
           <v-btn color="grey" outlined large @click="submit">
@@ -106,22 +39,18 @@
 import { Component, Vue } from 'nuxt-property-decorator'
 import firebase from '@/plugins/firebase'
 import { Member } from '@/datas/types'
+import startEndTime from '@/components/startEndTime.vue'
 import { Context } from '@nuxt/types'
 
 @Component({
-  components: {},
+  components: { startEndTime },
 })
 export default class Edit extends Vue {
   name: string = ''
   startTime: string = ''
   endTime: string = ''
-  modal: boolean = false
-  modal2: boolean = false
 
   required = (v: string) => !!v || '入力して下さい'
-  get dateIntegrity() {
-    return this.startTime < this.endTime || '時間を見直して下さい'
-  }
 
   async asyncData(context: Context) {
     const db = firebase.firestore()
