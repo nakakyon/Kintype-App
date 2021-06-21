@@ -21,10 +21,3 @@ declare module '@nuxt/types' {
     $timeYMDLabel(date?: Date | string): string
   }
 }
-
-declare module 'vue/types/options' {
-  interface ComponentOptions<V extends Vue> {
-    layout?: string
-    middleware?: string | String[]
-  }
-}

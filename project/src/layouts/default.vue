@@ -1,21 +1,21 @@
 <template>
   <v-app>
-    <v-app-bar fixed app color="#e3bf00">
+    <v-app-bar fixed app dense>
       <v-toolbar-title
-        class="font-weight-black"
+        class="font-weight-bold"
         style="cursor: pointer"
         @click="$router.push('/')"
         v-text="title"
       />
       <v-spacer />
-      <template v-slot:extension>
-        <v-tabs v-model="activeTab" fixed-tabs color="black">
+      <template #extension>
+        <v-tabs v-model="activeTab" fixed-tabs>
           <v-tab
             v-for="tab in tabs"
             :key="tab.id"
             :to="tab.route"
             exact
-            color="black"
+            class="font-weight-bold"
           >
             {{ tab.name }}
           </v-tab>
@@ -24,10 +24,10 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <v-theme-provider light>
+        <v-theme-provider>
           <v-row justify="center">
             <v-col cols="12" md="8">
-              <h2 class="headline font-weight-bold">
+              <h2 class="headline">
                 {{ pageName }}
               </h2>
             </v-col>
@@ -36,9 +36,10 @@
         <nuxt />
       </v-container>
     </v-main>
+    <span class="mt-2" />
     <v-footer app :absolute="true">
       <v-container>
-        <v-theme-provider light>
+        <v-theme-provider>
           <v-row justify="center">
             <v-col cols="12" md="8" class="pb-0">
               <h2 class="headline font-weight-bold heading-border mb-3">
@@ -56,7 +57,7 @@
                 dense
                 background-color="white"
               >
-                <template v-slot:append-outer>
+                <template #append-outer>
                   <v-btn color="grey" outlined @click="copyText">
                     <span class="grey--text text--darken-1 font-weight-bold">
                       コピー
@@ -187,7 +188,12 @@ export default class Index extends Vue {
   margin-top: 2px !important;
 }
 .heading-border {
-  border-image: linear-gradient(0.25turn, #e3bf00 100px, #111 100px) 1/0 0 5px 0;
+  border-image: linear-gradient(
+      0.25turn,
+      var(--v-primary-base) 100px,
+      var(--v-accent-base) 100px
+    )
+    1/0 0 5px 0;
   border-bottom: solid;
   display: inline-block;
 }

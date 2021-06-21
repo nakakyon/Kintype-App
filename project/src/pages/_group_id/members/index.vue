@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-row justify="center">
       <v-col v-if="memberList.length === 0" cols="12" md="8">
         利用者が追加されていません<br />
@@ -74,6 +74,7 @@ export default class Index extends Vue {
         endTime: data.end_time,
         route: `/${context.params.group_id}/members/${doc.id}/edit`,
       })
+      return ''
     })
     return { memberList }
   }

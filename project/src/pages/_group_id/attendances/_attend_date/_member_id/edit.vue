@@ -1,9 +1,9 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-form ref="form">
       <v-row justify="center">
         <v-col cols="12" md="8">
-          {{ name }}さんの{{ this.$timeYMDLabel(attendDate) }}の勤怠
+          {{ name }}さんの{{ $timeYMDLabel(attendDate) }}の勤怠
         </v-col>
         <v-col cols="12" md="8">
           <v-select

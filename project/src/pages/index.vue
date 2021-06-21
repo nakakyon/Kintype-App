@@ -124,7 +124,7 @@
           <v-divider></v-divider>
         </v-responsive> -->
 
-        <v-theme-provider light>
+        <v-theme-provider>
           <v-form ref="form">
             <v-row justify="center">
               <v-col cols="12" md="8">
@@ -214,6 +214,7 @@ export default class Index extends Vue {
     }
     removeItems.map(value => {
       localStorage.removeItem(value)
+      return ''
     })
   }
 
@@ -248,7 +249,12 @@ export default class Index extends Vue {
 </script>
 <style>
 .heading-border {
-  border-image: linear-gradient(0.25turn, #e3bf00 100px, #111 100px) 1/0 0 5px 0;
+  border-image: linear-gradient(
+      0.25turn,
+      var(--v-primary-base) 100px,
+      var(--v-accent-base) 100px
+    )
+    1/0 0 5px 0;
   border-bottom: solid;
   display: inline-block;
 }

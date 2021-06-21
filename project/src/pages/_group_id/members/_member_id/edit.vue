@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-form ref="form">
       <v-row justify="center">
         <v-col cols="12" md="8">

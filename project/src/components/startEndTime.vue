@@ -8,7 +8,7 @@
         persistent
         width="290px"
       >
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-text-field
             v-model="syncedStartTime"
             :label="startTimeLabel"
@@ -21,12 +21,8 @@
         </template>
         <v-time-picker v-if="modal" v-model="syncedStartTime" full-width>
           <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="modal = false">Cancel</v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click="$refs.dialog.save(syncedStartTime)"
-          >
+          <v-btn text @click="modal = false">Cancel</v-btn>
+          <v-btn text @click="$refs.dialog.save(syncedStartTime)">
             OK
           </v-btn>
         </v-time-picker>
@@ -40,7 +36,7 @@
         persistent
         width="290px"
       >
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-text-field
             v-model="syncedEndTime"
             :label="endTimeLabel"
@@ -54,12 +50,8 @@
         </template>
         <v-time-picker v-if="modal2" v-model="syncedEndTime" full-width>
           <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="modal2 = false">Cancel</v-btn>
-          <v-btn
-            text
-            color="primary"
-            @click="$refs.dialog2.save(syncedEndTime)"
-          >
+          <v-btn text @click="modal2 = false">Cancel</v-btn>
+          <v-btn text @click="$refs.dialog2.save(syncedEndTime)">
             OK
           </v-btn>
         </v-time-picker>

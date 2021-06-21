@@ -79,6 +79,9 @@ export default {
           success: colors.green.accent3,
         },
       },
+      options: {
+        customProperties: true
+      }
     },
   },
 

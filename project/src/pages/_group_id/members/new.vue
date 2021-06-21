@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-form ref="form">
       <v-row justify="center">
         <v-col cols="12" md="8">
@@ -32,10 +32,14 @@
         :timeout="10000"
         absolute
         centered
-      >
-        勤怠ページを作成しました<br />
-        利用者の追加を行い、ページを共有しましょう
-        <template v-slot:action="{ attrs }">
+        outlined
+        color="primary"
+        text
+        ><span class="black--text">
+          勤怠ページを作成しました<br />
+          利用者の追加を行い、ページを共有しましょう</span
+        >
+        <template #action="{ attrs }">
           <v-btn text v-bind="attrs" @click="snackbar = false">
             Close
           </v-btn>

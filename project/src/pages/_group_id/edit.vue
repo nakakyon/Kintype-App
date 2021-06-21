@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-form ref="form">
       <v-row justify="center">
         <v-col cols="12" md="8">
@@ -18,7 +18,7 @@
             </span>
           </v-btn>
           <v-dialog v-model="dialog" persistent max-width="290">
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn
                 color="red"
                 outlined

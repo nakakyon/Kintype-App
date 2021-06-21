@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-row justify="center">
       <v-col v-if="attendanceList.length === 0" cols="12" md="8">
         利用者が追加されていません<br />
@@ -14,16 +14,19 @@
           :timeout="5000"
           absolute
           centered
+          outlined
+          color="primary"
+          text
           style="white-space: pre-wrap;"
         >
-          <span>{{ text }}</span>
-          <template v-slot:action="{ attrs }">
+          <span class="black--text">{{ text }}</span>
+          <template #action="{ attrs }">
             <v-btn text v-bind="attrs" @click="snackbar = false">
               Close
             </v-btn>
           </template>
         </v-snackbar>
-        <v-col cols="12" md="8" class="ma-0 pa-0">
+        <v-col cols="12" md="8" class="ml-2 mb-2 pa-0">
           <span class="attend-date-select">
             <v-select
               v-model="dateSelect"
@@ -32,12 +35,14 @@
               item-value="value"
               dense
               outlined
-              style="width: 370px"
+              style="width: 350px"
               class="ma-0 pa-0"
               @input="changeRoute"
             >
-              <template v-slot:append-outer>
-                <span style="white-space: nowrap">の勤怠を表示しています</span>
+              <template #append-outer>
+                <span class="body-2" style="white-space: nowrap"
+                  >の勤怠を表示しています</span
+                >
               </template>
             </v-select>
           </span>
@@ -182,6 +187,7 @@ export default class Index extends Vue {
           route: `/${context.params.group_id}/attendances/${attendDate}/${doc.id}/edit`,
         })
       }
+      return ''
     })
     return { attendanceList }
   }
@@ -248,7 +254,7 @@ export default class Index extends Vue {
   -moz-border-radius: 50%;
   border-radius: 50%;
   /* background-color: lime; */
-  background-color: #e3bf00;
+  background-color: var(--v-info-base);
 }
 .l-border {
   border-left: 1px solid lightgray;
